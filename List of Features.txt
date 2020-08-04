@@ -1,0 +1,23 @@
+1. Source IP (Source = Originating IP)
+2. Destination IP
+3. Source Port
+4. Destination Port
+5. Protocol (TCP,UDP,ICMP)
+6. PX (total number of packets exchanged) *IMP
+7. NNP (number of null packets (0 length payload) exchanged)
+8. NSP (number of small packets (length 63-400) exchanged)
+9. PSP (percentage of small packets exchanged)
+10. PNP (percentage of null packets exchanged)
+11. IOPR (ratio between the number of incoming packets over the number of outgoing packets)
+12. Reconnect (number of reconnects)
+13. Duration (flow duration) *Used mainly for detecting centralized botnets (IRC vs non-IRC) XXXX
+14. FPS (length of the first packets)
+15. TBT (total number of bytes)
+16. APL (average payload packet length)
+17. DPL (total number of packets with the same length) *how to calculate
+18. PV (standard deviation of payload packet length)
+19. BS (average bits-per-second)
+20. PS (average packtes-per-second in a time window) XXXX
+21. AIT (average inter-arrival time of packets)
+22. PPS (average-packets-per-second)
+23. HTTP Method (GET,POST,PUT,DELETE,Null)
