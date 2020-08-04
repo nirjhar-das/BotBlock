@@ -3,9 +3,6 @@ from scapy.layers.http import *
 import os
 import csv
 
-filePath = os.path.join(os.getcwd(), "Botnet_Detection_Dataset",
-                        "Benign", "p2pbox1", "p2pbox1.2011032611.pcap.clean.pcap")
-
 
 def create_features(label, srcPort, dstPort, proto=4, fps=0, byte_size=0, payl=0, time=0, dur=0, incoming=False, http=4):
     features = {
@@ -270,52 +267,52 @@ with open('Results.csv', 'x') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=field_names)
     writer.writeheader()
 
-# Launch Benign
-for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Benign')):
-    for name in files:
-        filePath = os.path.join(root, name)
-        if(name != "ip_details.txt"):
-            flow_features = flows_from_pcap(0, filePath)
-            if('dur' in flow_features):
-                flow_features['dur'] = float(flow_features['dur'])
-            if('BS' in flow_features):
-                flow_features['BS'] = float(flow_features['BS'])
-            if('PPS' in flow_features):
-                flow_features['PPS'] = float(flow_features['PPS'])
-            if('AIT' in flow_features):
-                flow_features['AIT'] = float(flow_features['AIT'])
-            if('time' in flow_features):
-                flow_features['time'] = float(flow_features['time'])
-            if('HTTPM' in flow_features):
-                flow_features['HTTPM0'] = flow_features['HTTPM'][0]
-                flow_features['HTTPM1'] = flow_features['HTTPM'][1]
-                flow_features['HTTPM2'] = flow_features['HTTPM'][2]
-                flow_features['HTTPM3'] = flow_features['HTTPM'][3]
-                flow_features['HTTPM4'] = flow_features['HTTPM'][4]
-                del flow_features['HTTPM']
-            writer.writerows(flow_features)
+    # Launch Benign
+    for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Benign')):
+        for name in files:
+            filePath = os.path.join(root, name)
+            if(name != "ip_details.txt"):
+                flow_features = flows_from_pcap(0, filePath)
+                if('dur' in flow_features):
+                    flow_features['dur'] = float(flow_features['dur'])
+                if('BS' in flow_features):
+                    flow_features['BS'] = float(flow_features['BS'])
+                if('PPS' in flow_features):
+                    flow_features['PPS'] = float(flow_features['PPS'])
+                if('AIT' in flow_features):
+                    flow_features['AIT'] = float(flow_features['AIT'])
+                if('time' in flow_features):
+                    flow_features['time'] = float(flow_features['time'])
+                if('HTTPM' in flow_features):
+                    flow_features['HTTPM0'] = flow_features['HTTPM'][0]
+                    flow_features['HTTPM1'] = flow_features['HTTPM'][1]
+                    flow_features['HTTPM2'] = flow_features['HTTPM'][2]
+                    flow_features['HTTPM3'] = flow_features['HTTPM'][3]
+                    flow_features['HTTPM4'] = flow_features['HTTPM'][4]
+                    del flow_features['HTTPM']
+                writer.writerows(flow_features)
 
-# Launch Botnet
-for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Botnet')):
-    for name in files:
-        filePath = os.path.join(root, name)
-        if(name != "storm-IP" and name != "vinchuca_IP" and name != "zeus_IP"):
-            flow_features = flows_from_pcap(1, filePath)
-            if('dur' in flow_features):
-                flow_features['dur'] = float(flow_features['dur'])
-            if('BS' in flow_features):
-                flow_features['BS'] = float(flow_features['BS'])
-            if('PPS' in flow_features):
-                flow_features['PPS'] = float(flow_features['PPS'])
-            if('AIT' in flow_features):
-                flow_features['AIT'] = float(flow_features['AIT'])
-            if('time' in flow_features):
-                flow_features['time'] = float(flow_features['time'])
-            if('HTTPM' in flow_features):
-                flow_features['HTTPM0'] = flow_features['HTTPM'][0]
-                flow_features['HTTPM1'] = flow_features['HTTPM'][1]
-                flow_features['HTTPM2'] = flow_features['HTTPM'][2]
-                flow_features['HTTPM3'] = flow_features['HTTPM'][3]
-                flow_features['HTTPM4'] = flow_features['HTTPM'][4]
-                del flow_features['HTTPM']
-            writer.writerows(flow_features)
+    # Launch Botnet
+    for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Botnet')):
+        for name in files:
+            filePath = os.path.join(root, name)
+            if(name != "storm-IP" and name != "vinchuca_IP" and name != "zeus_IP"):
+                flow_features = flows_from_pcap(1, filePath)
+                if('dur' in flow_features):
+                    flow_features['dur'] = float(flow_features['dur'])
+                if('BS' in flow_features):
+                    flow_features['BS'] = float(flow_features['BS'])
+                if('PPS' in flow_features):
+                    flow_features['PPS'] = float(flow_features['PPS'])
+                if('AIT' in flow_features):
+                    flow_features['AIT'] = float(flow_features['AIT'])
+                if('time' in flow_features):
+                    flow_features['time'] = float(flow_features['time'])
+                if('HTTPM' in flow_features):
+                    flow_features['HTTPM0'] = flow_features['HTTPM'][0]
+                    flow_features['HTTPM1'] = flow_features['HTTPM'][1]
+                    flow_features['HTTPM2'] = flow_features['HTTPM'][2]
+                    flow_features['HTTPM3'] = flow_features['HTTPM'][3]
+                    flow_features['HTTPM4'] = flow_features['HTTPM'][4]
+                    del flow_features['HTTPM']
+                writer.writerows(flow_features)
