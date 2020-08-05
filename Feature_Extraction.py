@@ -82,7 +82,7 @@ def update_features(features, nnp=False, nsp=False, incoming=False, byte_size=0,
 
     return features
 
-
+idx = 1
 def flows_from_pcap(label, filePath):
     flows = {}
     fpcap = PcapReader(filePath)
@@ -203,10 +203,9 @@ def flows_from_pcap(label, filePath):
         else:
             flows[tuple5] = create_features(label, sport, dport, proto, fps=pload, byte_size=bs, payl=pload,
                                             time=pkt.time, dur=dur, incoming=False, http=http_meth)            # features_list
-        if i % 10000 == 0:
-            print(i, ' packets processed')
-        i = i + 1
-
+        
+    print('Completed pcap : ', idx)
+    idx = idx + 1
     return flows
 
 
@@ -259,7 +258,6 @@ field_names = [
     'HTTPM2',
     'HTTPM3',
     'HTTPM4',
-    'time',
     'malicious'
 ]
 
@@ -273,24 +271,21 @@ with open('Results.csv', 'x') as csvfile:
             filePath = os.path.join(root, name)
             if(name != "ip_details.txt"):
                 flow_features = flows_from_pcap(0, filePath)
-                if('dur' in flow_features):
-                    flow_features['dur'] = float(flow_features['dur'])
-                if('BS' in flow_features):
-                    flow_features['BS'] = float(flow_features['BS'])
-                if('PPS' in flow_features):
-                    flow_features['PPS'] = float(flow_features['PPS'])
-                if('AIT' in flow_features):
-                    flow_features['AIT'] = float(flow_features['AIT'])
-                if('time' in flow_features):
-                    flow_features['time'] = float(flow_features['time'])
-                if('HTTPM' in flow_features):
-                    flow_features['HTTPM0'] = flow_features['HTTPM'][0]
-                    flow_features['HTTPM1'] = flow_features['HTTPM'][1]
-                    flow_features['HTTPM2'] = flow_features['HTTPM'][2]
-                    flow_features['HTTPM3'] = flow_features['HTTPM'][3]
-                    flow_features['HTTPM4'] = flow_features['HTTPM'][4]
-                    del flow_features['HTTPM']
-                writer.writerows(flow_features)
+                for k in flow_features :
+                    dic = flow_features[k]
+                    dic['dur'] = float(dic['dur'])
+                    dic['BS'] = float(dic['BS'])
+                    dic['PPS'] = float(dic['PPS'])
+                    dic['AIT'] = float(dic['AIT'])
+                    dic['HTTPM0'] = dic['HTTPM'][0]
+                    dic['HTTPM1'] = dic['HTTPM'][1]
+                    dic['HTTPM2'] = dic['HTTPM'][2]
+                    dic['HTTPM3'] = dic['HTTPM'][3]
+                    dic['HTTPM4'] = dic['HTTPM'][4]
+                    del dic['HTTPM']
+                    del dic['time']
+                list_feature_dict = [flow_features[k] for k in flow_features]
+                writer.writerows(list_feature_dict)
 
     # Launch Botnet
     for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Botnet')):
@@ -298,21 +293,18 @@ with open('Results.csv', 'x') as csvfile:
             filePath = os.path.join(root, name)
             if(name != "storm-IP" and name != "vinchuca_IP" and name != "zeus_IP"):
                 flow_features = flows_from_pcap(1, filePath)
-                if('dur' in flow_features):
-                    flow_features['dur'] = float(flow_features['dur'])
-                if('BS' in flow_features):
-                    flow_features['BS'] = float(flow_features['BS'])
-                if('PPS' in flow_features):
-                    flow_features['PPS'] = float(flow_features['PPS'])
-                if('AIT' in flow_features):
-                    flow_features['AIT'] = float(flow_features['AIT'])
-                if('time' in flow_features):
-                    flow_features['time'] = float(flow_features['time'])
-                if('HTTPM' in flow_features):
-                    flow_features['HTTPM0'] = flow_features['HTTPM'][0]
-                    flow_features['HTTPM1'] = flow_features['HTTPM'][1]
-                    flow_features['HTTPM2'] = flow_features['HTTPM'][2]
-                    flow_features['HTTPM3'] = flow_features['HTTPM'][3]
-                    flow_features['HTTPM4'] = flow_features['HTTPM'][4]
-                    del flow_features['HTTPM']
+                for k in flow_features :
+                    dic = flow_features[k]
+                    dic['dur'] = float(dic['dur'])
+                    dic['BS'] = float(dic['BS'])
+                    dic['PPS'] = float(dic['PPS'])
+                    dic['AIT'] = float(dic['AIT'])
+                    del dic['time']
+                    dic['HTTPM0'] = dic['HTTPM'][0]
+                    dic['HTTPM1'] = dic['HTTPM'][1]
+                    dic['HTTPM2'] = dic['HTTPM'][2]
+                    dic['HTTPM3'] = dic['HTTPM'][3]
+                    dic['HTTPM4'] = dic['HTTPM'][4]
+                    del dic['HTTPM']
+                list_feature_dict = [flow_features[k] for k in flow_features]
                 writer.writerows(flow_features)
