@@ -127,9 +127,16 @@ def flows_from_pcap(label, filePath):
         except:
             continue
 
-        if 'Ethernet' in pkt:
-            eth = pkt['Ethernet']
-            if eth.type == 2048:
+        if 'Ethernet' in pkt or 'cooked linux' in pkt:
+            flag = False
+            if('Ethernet' in pkt):
+                eth = pkt['Ethernet']
+                if eth.type == 2048:
+                    flag = True
+            else:
+                lin = pkt['cooked linux']
+                flag = lin.proto == 2048
+            if flag is True:
                 ip = pkt['IP']
                 proto = ip.proto
                 srcAddr = ip.src
@@ -297,13 +304,13 @@ field_names = [
     'malicious'
 ]
 
-with open('Results.csv', 'x') as csvfile:
+with open('Results_2.csv', 'x') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=field_names)
     writer.writeheader()
 
     i = 0
     # Launch Benign
-    for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Benign')):
+    """for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Benign')):
         for name in files:
             filePath = os.path.join(root, name)
             if(name != "ip_details.txt"):
@@ -335,10 +342,10 @@ with open('Results.csv', 'x') as csvfile:
                         del flow_features[flow]['time']
                     writer.writerow(flow_features[flow])
                 i = i+1
-                print(i, "Files Processed:", filePath, len(flow_features))
+                print(i, "Files Processed:", filePath, len(flow_features))"""
 
     # Launch Botnet
-    for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Botnet')):
+    for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Botnet', 'storm')):
         for name in files:
             filePath = os.path.join(root, name)
             if(name != "storm-IP" and name != "vinchuca_IP" and name != "zeus_IP"):
@@ -366,6 +373,8 @@ with open('Results.csv', 'x') as csvfile:
                         flow_features[flow]['HTTPM3'] = flow_features[flow]['HTTPM'][3]
                         flow_features[flow]['HTTPM4'] = flow_features[flow]['HTTPM'][4]
                         del flow_features[flow]['HTTPM']
+                    if('time' in flow_features[flow]):
+                        del flow_features[flow]['time']
                     writer.writerow(flow_features[flow])
                 i = i+1
                 print(i, "Files Processed:", filePath)
