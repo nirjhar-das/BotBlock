@@ -307,6 +307,6 @@ with open('Results.csv', 'x') as csvfile:
                     dic['HTTPM4'] = dic['HTTPM'][4]
                     del dic['HTTPM']
                 list_feature_dict = [flow_features[k] for k in flow_features]
-                writer.writerows(flow_features)
+                writer.writerows(list_feature_dict)
                 print('Completed pcap : ', idx)
                 idx = idx + 1
