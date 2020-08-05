@@ -4,9 +4,11 @@ import os
 import csv
 
 
-def create_features(label, srcPort, dstPort, proto=4, fps=0, byte_size=0, payl=0, time=0, dur=0, incoming=False, http=4):
+def create_features(label, srcAddr, dstAddr, srcPort, dstPort, proto=4, fps=0, byte_size=0, payl=0, time=0, dur=0, incoming=False, http=4):
     features = {
-        'malicious': label
+        'malicious': label,
+        'srcAddr': srcAddr,
+        'dstAddr': dstAddr
     }
     features['srcPort'] = srcPort
     features['dstPort'] = dstPort
@@ -105,18 +107,26 @@ def flows_from_pcap(label, filePath):
     f_dup = PcapReader(filePath)
     pkt_nxt = next(f_dup)
     c = 0
-    i = 0
+    num = 0
+    total_bytes = 0
     for pkt in fpcap:
+        num = num+1
         dur = 0
         try:
             pkt_nxt = next(f_dup)
             dur = pkt_nxt.time - pkt.time
         except:
-            dur = 0.000001
+            dur = 0.0001
 
         srcAddr, dstAddr, sport, dport, proto = '', '', 0, 0, 3
         pload, http_meth = 0, 4
         tcp_close = False
+        try:
+            bs = pkt.len + 14
+            total_bytes += pkt.len
+        except:
+            continue
+
         if 'Ethernet' in pkt:
             eth = pkt['Ethernet']
             if eth.type == 2048:
@@ -193,7 +203,6 @@ def flows_from_pcap(label, filePath):
                     continue
             else:
                 continue
-        bs = pkt.len + 14
         nnp = pload == 0
         nsp = 63 <= bs and bs <= 400
         tuple5 = (srcAddr, sport, dstAddr, dport, proto, True)
@@ -217,12 +226,18 @@ def flows_from_pcap(label, filePath):
                 tuple5_inv = (dstAddr, dport, srcAddr, sport, proto, False)
                 flows[tuple5_inv] = temp
         else:
-            flows[tuple5] = create_features(label, sport, dport, proto, fps=pload, byte_size=bs, payl=pload,
+            flows[tuple5] = create_features(label, srcAddr, dstAddr, sport, dport, proto, fps=pload, byte_size=bs, payl=pload,
                                             time=pkt.time, dur=dur, incoming=False, http=http_meth)            # features_list
-        if i % 100000 == 0:
-            print(i, ' packets processed')
-        i = i + 1
 
+    for flow in flows:
+        if(num > 0):
+            flows[flow]['PPX'] = flows[flow]['PX']/num
+        else:
+            flows[flow]['PPX'] = 0
+        if(total_bytes > 0):
+            flows[flow]['PBT'] = flows[flow]['TBT']/total_bytes
+        else:
+            flows[flow]['PBT'] = 0
     return flows
 
 
@@ -251,9 +266,13 @@ malicious_ip = {
 }
 
 field_names = [
+    'srcAddr',
+    'dstAddr',
     'srcPort',
     'dstPort',
     'proto',
+    'PPX',
+    'PBT',
     'PX',
     'NNP',
     'NSP',
@@ -275,7 +294,6 @@ field_names = [
     'HTTPM2',
     'HTTPM3',
     'HTTPM4',
-    'time',
     'malicious'
 ]
 
@@ -283,6 +301,7 @@ with open('Results.csv', 'x') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=field_names)
     writer.writeheader()
 
+    i = 0
     # Launch Benign
     for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Benign')):
         for name in files:
@@ -312,7 +331,11 @@ with open('Results.csv', 'x') as csvfile:
                         flow_features[flow]['HTTPM3'] = flow_features[flow]['HTTPM'][3]
                         flow_features[flow]['HTTPM4'] = flow_features[flow]['HTTPM'][4]
                         del flow_features[flow]['HTTPM']
+                    if('time' in flow_features[flow]):
+                        del flow_features[flow]['time']
                     writer.writerow(flow_features[flow])
+                i = i+1
+                print(i, "Files Processed:", filePath, len(flow_features))
 
     # Launch Botnet
     for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Botnet')):
@@ -344,3 +367,5 @@ with open('Results.csv', 'x') as csvfile:
                         flow_features[flow]['HTTPM4'] = flow_features[flow]['HTTPM'][4]
                         del flow_features[flow]['HTTPM']
                     writer.writerow(flow_features[flow])
+                i = i+1
+                print(i, "Files Processed:", filePath)
