@@ -3,7 +3,7 @@ from scapy.layers.http import *
 import os
 import csv
 
-
+idx = 1
 def create_features(label, srcPort, dstPort, proto=4, fps=0, byte_size=0, payl=0, time=0, dur=0, incoming=False, http=4):
     features = {
         'malicious': label
@@ -82,7 +82,7 @@ def update_features(features, nnp=False, nsp=False, incoming=False, byte_size=0,
 
     return features
 
-idx = 1
+
 def flows_from_pcap(label, filePath):
     flows = {}
     fpcap = PcapReader(filePath)
@@ -204,8 +204,6 @@ def flows_from_pcap(label, filePath):
             flows[tuple5] = create_features(label, sport, dport, proto, fps=pload, byte_size=bs, payl=pload,
                                             time=pkt.time, dur=dur, incoming=False, http=http_meth)            # features_list
         
-    print('Completed pcap : ', idx)
-    idx = idx + 1
     return flows
 
 
@@ -286,6 +284,8 @@ with open('Results.csv', 'x') as csvfile:
                     del dic['time']
                 list_feature_dict = [flow_features[k] for k in flow_features]
                 writer.writerows(list_feature_dict)
+                print('Completed pcap : ', idx)
+                idx = idx + 1
 
     # Launch Botnet
     for root, dirs, files in os.walk(os.path.join('Botnet_Detection_Dataset', 'Botnet')):
@@ -308,3 +308,5 @@ with open('Results.csv', 'x') as csvfile:
                     del dic['HTTPM']
                 list_feature_dict = [flow_features[k] for k in flow_features]
                 writer.writerows(flow_features)
+                print('Completed pcap : ', idx)
+                idx = idx + 1
