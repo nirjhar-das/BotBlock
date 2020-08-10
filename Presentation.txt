@@ -21,7 +21,7 @@ features			Elimination (RFE)		was set to 33.33% of total	o F1 Score: 99.94%
 								train data available
 o Raw data files		o Based on the two
 were parsed and			results, we selected		o Cross-val Accuracy was
-decided features		the 12 best features		used as evaluation metric
+decided features		the 10 best features		used as evaluation metric
 were extracted
 								o Batch-learning was used
 o Dataset was split						with Batch-size of 10k.
