@@ -16,8 +16,6 @@ From Terminal : $ pip install <package name>
 ## C. This folder contains a python program "botnetdetect.py"
    This program takes an input as .pcap file and outputs in format
 
-Flow= (srcAddr, sPort, dstAddr, dPort, Protocol)	Prediction
-
-
- 
+Flow= (srcAddr, sPort, dstAddr, dPort, Protocol)	Prediction  
+   
 <Flow-5-Tuple>						malicious/benign
